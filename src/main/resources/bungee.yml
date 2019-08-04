@@ -1,5 +1,5 @@
 name: UltimateDiscord
-version: 1.2
+version: 1.3
 author: Schlaubi
 main: net.schlaubi.ultimatediscord.bungee.Main
 commands:

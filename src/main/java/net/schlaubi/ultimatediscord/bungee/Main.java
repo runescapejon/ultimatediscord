@@ -1,10 +1,19 @@
 package net.schlaubi.ultimatediscord.bungee;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
+import javax.security.auth.login.LoginException;
+
 import com.google.common.io.ByteStreams;
-import net.dv8tion.jda.core.AccountType;
-import net.dv8tion.jda.core.JDA;
-import net.dv8tion.jda.core.JDABuilder;
-import net.dv8tion.jda.core.entities.Game;
+
+import net.dv8tion.jda.api.AccountType;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.entities.Activity;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.plugin.Plugin;
@@ -12,9 +21,6 @@ import net.md_5.bungee.config.Configuration;
 import net.md_5.bungee.config.ConfigurationProvider;
 import net.md_5.bungee.config.YamlConfiguration;
 import net.schlaubi.ultimatediscord.util.MySQL;
-
-import javax.security.auth.login.LoginException;
-import java.io.*;
 
 public class Main extends Plugin {
 
@@ -37,8 +43,8 @@ public class Main extends Plugin {
 		JDABuilder bot = new JDABuilder(AccountType.BOT);
 		bot.setAutoReconnect(true);
 		bot.setToken(cfg.getString("Discord.token"));
-		bot.setGame(Game.playing(cfg.getString("Discord.game")));
-		bot.addEventListener(new MessageListener());
+		bot.setActivity(Activity.playing(cfg.getString("Discord.game")));
+		bot.addEventListeners(new MessageListener());
 		try {
 			jda = bot.build().awaitReady();
 		} catch (LoginException | InterruptedException e) {

@@ -1,8 +1,16 @@
 package net.schlaubi.ultimatediscord.bungee;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Random;
+import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
+
 import com.google.common.collect.ImmutableSet;
-import net.dv8tion.jda.core.entities.Member;
-import net.dv8tion.jda.core.managers.GuildController;
+
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -12,12 +20,10 @@ import net.md_5.bungee.api.plugin.TabExecutor;
 import net.md_5.bungee.config.Configuration;
 import net.schlaubi.ultimatediscord.util.MySQL;
 
-import java.util.*;
-
 public class CommandDiscord extends Command implements TabExecutor {
-
+	Configuration cfg = Main.getConfiguration();
 	public static HashMap<String, String> users = new HashMap<>();
-	private GuildController guild = new GuildController(Main.jda.getGuilds().get(0));
+	private Guild guild = Main.jda.getGuilds().get(0);
 
 	private String generateString() {
 		String CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567980";
@@ -72,16 +78,16 @@ public class CommandDiscord extends Command implements TabExecutor {
 						pp.sendMessage(new TextComponent(
 								cfg.getString("Messages.notverified").replace("&", "§").replace("%nl", "\n")));
 					} else {
-						Member member = guild.getGuild().getMemberById(MySQL.getValue(pp, "discordid"));
-						guild.removeRolesFromMember(member,
-								guild.getGuild().getRoleById(cfg.getLong("Roles.defaultrole"))).queue();
+						Member member = guild.getMemberById(MySQL.getValue(pp, "discordid"));
+						guild.removeRoleFromMember(member,
+								guild.getRoleById(cfg.getLong("Roles.defaultrole"))).queue();
 						new Timer().schedule(new TimerTask() {
 							@Override
 							public void run() {
 								cfg.getSection("Roles.group").getKeys().forEach(i -> {
 									if (pp.hasPermission("group." + i)) {
-										guild.removeSingleRoleFromMember(member,
-												guild.getGuild().getRoleById(cfg.getLong("Roles.group." + i))).queue();
+										guild.removeRoleFromMember(member,
+												guild.getRoleById(cfg.getLong("Roles.group." + i))).queue();
 									}
 								});
 							}
@@ -95,11 +101,11 @@ public class CommandDiscord extends Command implements TabExecutor {
 						pp.sendMessage(new TextComponent(
 								cfg.getString("Messages.notverified").replace("&", "§").replace("%nl", "\n")));
 					} else {
-						Member member = guild.getGuild().getMemberById(MySQL.getValue(pp, "discordid"));
+						Member member = guild.getMemberById(MySQL.getValue(pp, "discordid"));
 						cfg.getSection("Roles.group").getKeys().forEach(i -> {
 							if (pp.hasPermission("group." + i)) {
-								guild.addSingleRoleToMember(member,
-										guild.getGuild().getRoleById(cfg.getLong("Roles.group." + i))).queue();
+								guild.addRoleToMember(member, guild.getRoleById(cfg.getLong("Roles.group." + i)))
+										.queue();
 							}
 						});
 						pp.sendMessage(new TextComponent(

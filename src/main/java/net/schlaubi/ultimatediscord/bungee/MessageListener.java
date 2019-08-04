@@ -1,25 +1,25 @@
 package net.schlaubi.ultimatediscord.bungee;
 
-import net.dv8tion.jda.core.JDA;
-import net.dv8tion.jda.core.Permission;
-import net.dv8tion.jda.core.entities.ChannelType;
-import net.dv8tion.jda.core.entities.Member;
-import net.dv8tion.jda.core.entities.Role;
-import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.core.hooks.ListenerAdapter;
-import net.dv8tion.jda.core.managers.GuildController;
+import java.util.HashMap;
+import java.util.Timer;
+import java.util.TimerTask;
+
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.ChannelType;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.config.Configuration;
 import net.schlaubi.ultimatediscord.util.MySQL;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.HashMap;
 
 public class MessageListener extends ListenerAdapter {
 
 	private HashMap<String, String> users = CommandDiscord.users;
-
 
 	private String getUser(String code) {
 		for (String key : users.keySet()) {
@@ -51,17 +51,16 @@ public class MessageListener extends ListenerAdapter {
 			} else if (message.startsWith("!verify")) {
 				if (users.containsValue(args[1])) {
 					ProxiedPlayer pp = ProxyServer.getInstance().getPlayer(getUser(args[1]));
-					GuildController guild = new GuildController(jda.getGuilds().get(0));
+					Guild guild = event.getGuild();
 					Member member = jda.getGuilds().get(0).getMember(event.getAuthor());
-					guild.addRolesToMember(member, guild.getGuild().getRoleById(cfg.getLong("Roles.defaultrole")))
-							.queue();
+					guild.addRoleToMember(member, guild.getRoleById(cfg.getLong("Roles.defaultrole"))).queue();
 					new Timer().schedule(new TimerTask() {
 						@Override
 						public void run() {
 							cfg.getSection("Roles.group").getKeys().forEach(i -> {
 								if (pp.hasPermission("group." + i)) {
-									guild.addSingleRoleToMember(member,
-											guild.getGuild().getRoleById(cfg.getLong("Roles.group." + i))).queue();
+									guild.addRoleToMember(member, guild.getRoleById(cfg.getLong("Roles.group." + i)))
+											.queue();
 								}
 							});
 						}
