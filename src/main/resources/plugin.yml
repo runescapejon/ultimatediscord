@@ -1,0 +1,9 @@
+name: UltimateDiscord
+version: 1.3
+author: Schlaubi
+main: net.schlaubi.ultimatediscord.spigot.Main
+depend: []
+commands:
+  discord:
+    description: Discord command
+    permission: UltimateDiscord.command

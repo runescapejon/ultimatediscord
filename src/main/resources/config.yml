@@ -5,6 +5,9 @@ MySQL:
   database: minecraft
   password: ''
 
+#add your ServerID
+Guild:
+  GuildServerID: 13375455233942420
 
 Discord:
   token: CLIENTTOKEN

@@ -23,7 +23,7 @@ import net.schlaubi.ultimatediscord.util.MySQL;
 public class CommandDiscord extends Command implements TabExecutor {
 	Configuration cfg = Main.getConfiguration();
 	public static HashMap<String, String> users = new HashMap<>();
-	private Guild guild = Main.jda.getGuilds().get(0);
+	private Guild guild = Main.jda.getGuildById(cfg.getLong("Guild.GuildServerID"));
 
 	private String generateString() {
 		String CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567980";
@@ -79,8 +79,17 @@ public class CommandDiscord extends Command implements TabExecutor {
 								cfg.getString("Messages.notverified").replace("&", "§").replace("%nl", "\n")));
 					} else {
 						Member member = guild.getMemberById(MySQL.getValue(pp, "discordid"));
+						if (member != null)  {
 						guild.removeRoleFromMember(member,
 								guild.getRoleById(cfg.getLong("Roles.defaultrole"))).queue();
+						}
+						//if members delete their discord account .-.
+						if (member == null) {
+							MySQL.deleteUser(pp);
+							pp.sendMessage(new TextComponent(
+									cfg.getString("Messages.unlinked").replace("&", "§").replace("%nl", "\n")));
+							return;
+						}
 						new Timer().schedule(new TimerTask() {
 							@Override
 							public void run() {

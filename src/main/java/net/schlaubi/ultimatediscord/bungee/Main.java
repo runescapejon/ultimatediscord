@@ -5,6 +5,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 import javax.security.auth.login.LoginException;
 
@@ -29,16 +31,23 @@ public class Main extends Plugin {
 	private static Main instance;
 
 	@Override
-	public void onEnable() {
-		instance = this;
+	public void onEnable() {	 
+	instance = this;
+	  getProxy().getScheduler().schedule(this, () -> start(), 15, TimeUnit.SECONDS);
+	//CompletableFuture.runAsync(() -> start());
+	}
+
+	private void start() {
+ 
 		loadConfig();
 		MySQL.connect(getConfiguration());
 		MySQL.createDatabase();
 		startBot();
 		ProxyServer.getInstance().getPluginManager().registerCommand(this, new CommandDiscord("discord"));
 	}
-
+	
 	private void startBot() {
+
 		Configuration cfg = getConfiguration();
 		JDABuilder bot = new JDABuilder(AccountType.BOT);
 		bot.setAutoReconnect(true);
